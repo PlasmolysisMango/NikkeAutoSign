@@ -1,10 +1,8 @@
-import json
 import logging
-import os.path
 
 import requests
 
-from common import COOKIES_FILE_PATH, UPLOAD_COOKIES_FILE_PATH
+from common import parse_headers, load_cookies
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -30,28 +28,6 @@ Referer: https://www.blablalink.com/
 Accept-Encoding: gzip, deflate, br, zstd
 Accept-Language: zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
 '''
-
-
-def parse_headers(header_str):
-    headers = {}
-    for line in header_str.splitlines():
-        if not line.strip():
-            continue
-        if ':' in line:
-            key, value = line.split(':', 1)
-            headers[key.strip()] = value.strip()  # ← 关键：value.strip()
-    return headers
-
-
-def load_cookies():
-    if os.path.exists(COOKIES_FILE_PATH):
-        with open(COOKIES_FILE_PATH, "r") as f:
-            cookies = json.load(f)
-    else:
-        with open(UPLOAD_COOKIES_FILE_PATH, "r") as f:
-            cookies = json.load(f)
-
-    return cookies
 
 
 def check_in(cookies=None):

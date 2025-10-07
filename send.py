@@ -1,10 +1,12 @@
 import json
+import logging
 import re
 
 import requests
 
 from common import SEND_KEY_FILE_PATH
 
+_LOGGER = logging.getLogger(__name__)
 
 def sc_send(title, message='', options=None):
     with open(SEND_KEY_FILE_PATH, "r") as f:
