@@ -2,3 +2,5 @@ edgedriver_win64/*
 .venv/*
 *.json
 *.log
+**/__pycache__/
+*.py[cod]
