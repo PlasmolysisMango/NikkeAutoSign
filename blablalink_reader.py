@@ -3,6 +3,7 @@ import random
 import time
 
 import requests
+from requests import JSONDecodeError
 
 from common import load_cookies, parse_headers
 
@@ -75,13 +76,20 @@ class BlablaLinkReader:
 
         _LOGGER.info(f"初始化session成功")
 
+    @staticmethod
+    def _safe_json_response(resp: requests.Response):
+        try:
+            return resp.json()
+        except JSONDecodeError:
+            return resp.text
+
     def session_post(self, *args, session, random_sleep=True, **kwargs):
         _LOGGER.info(f"POST 请求: {args}, {kwargs}")
         ret: requests.Response = session.post(*args, **kwargs)
         ret.raise_for_status()
         if random_sleep:
             time.sleep(random.uniform(0.2, 0.8))
-        _LOGGER.info(f"POST 结果: {ret.text}")
+        _LOGGER.info(f"POST 结果: {self._safe_json_response(ret)}")
         return ret
 
     def api_post(self, url, json_data, message="请求", session=None):
@@ -99,7 +107,7 @@ class BlablaLinkReader:
         ret.raise_for_status()
         if random_sleep:
             time.sleep(random.uniform(0.2, 0.8))
-        _LOGGER.info(f"GET 结果: {ret.text}")
+        _LOGGER.info(f"GET 结果: {self._safe_json_response(ret)}")
         return ret
 
     def api_get(self, url, params=None, message="请求", session=None):

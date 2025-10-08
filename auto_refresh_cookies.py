@@ -170,7 +170,8 @@ def upload_json(json_dict):
         upload_url = f"http://127.0.0.1:{local_port}/upload_cookies"
         ret = requests.post(upload_url, json=json_dict)
         ret.raise_for_status()
-        _LOGGER.info(f"结果: {ret.text}")
+        json_ret = ret.json()
+        _LOGGER.info(f"结果: {json_ret}")
     finally:
         if ssh_tunnel:
             ssh_tunnel.terminate()
@@ -179,5 +180,5 @@ def upload_json(json_dict):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
                         handlers=[logging.StreamHandler()])
-    ret = refresh_cookies(refresh=True)
+    ret = refresh_cookies(refresh=False)
     upload_json(ret)
