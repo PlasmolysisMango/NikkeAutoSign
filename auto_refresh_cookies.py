@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import random
+import subprocess
 import time
 
 import requests
@@ -155,10 +156,24 @@ def refresh_cookies(refresh=True):
 
 def upload_json(json_dict):
     server, port = load_server(ACCOUNT_FILE_PATH)
-    upload_url = f"http://{server}:{port}/upload_cookies"
-    ret = requests.post(upload_url, json=json_dict)
-    ret.raise_for_status()
-    _LOGGER.info(f"结果: {ret.text}")
+    ssh_tunnel = None
+    try:
+        _LOGGER.info("正在启动 SSH 隧道...")
+        local_port = "8888"
+        remote_server = f"127.0.0.1:{port}"
+        ssh_tunnel = subprocess.Popen([
+            'ssh', '-L', f'{local_port}:{remote_server}', '-N', '-f',
+            '-o', 'StrictHostKeyChecking=no',
+            f'root@{server}'
+        ])
+        _LOGGER.info(f"SSH 隧道已启动，正在转发到 {remote_server}...")
+        upload_url = f"http://127.0.0.1:{local_port}/upload_cookies"
+        ret = requests.post(upload_url, json=json_dict)
+        ret.raise_for_status()
+        _LOGGER.info(f"结果: {ret.text}")
+    finally:
+        if ssh_tunnel:
+            ssh_tunnel.terminate()
 
 
 if __name__ == '__main__':
