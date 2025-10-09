@@ -122,7 +122,7 @@ class BlablaLinkReader:
     def list_post(self, want=20, filter_is_liked=None, start_cursor=None, max_page=10):
         url = self.host + "/api/ugc/direct/standalonesite/Dynamics/GetPostList"
         next_cursor = None or start_cursor
-        post_list = []
+        post_set = set()
         page = 0
         for i in range(max_page):
             # json_data = {"search_type": 0, "plate_id": 46, "plate_unique_id": "recommend", "order_by": 2, "limit": "10",
@@ -147,13 +147,13 @@ class BlablaLinkReader:
                 uuid, title, is_liked = self._parse_post(post_data)
                 if filter_is_liked is not None and filter_is_liked != is_liked:
                     continue
-                post_list.append((uuid, title, is_liked))
-            if len(post_list) >= want:
+                post_set.add((uuid, title, is_liked))
+            if len(post_set) >= want:
                 break
-        if len(post_list) < want:
-            raise Exception(f"获取列表失败, 结果数量不足, want={want}, get={len(post_list)}, max_page={max_page}")
-        _LOGGER.info(f"获取列表成功，{post_list}")
-        return post_list, next_cursor
+        if len(post_set) < want:
+            raise Exception(f"获取列表失败, 结果数量不足, want={want}, get={len(post_set)}, max_page={max_page}")
+        _LOGGER.info(f"获取列表成功，{post_set}")
+        return list(post_set), next_cursor
 
     @staticmethod
     def _is_post_liked(post_data):

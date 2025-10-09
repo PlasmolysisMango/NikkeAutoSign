@@ -137,7 +137,7 @@ def sign():
     # 随机选择帖子并点赞
     _LOGGER.info("开始阅读并点赞")
     try:
-        want_like_num = 5
+        want_like_num = random.randint(6, 8)
         unliked_list, next_cursor = reader.list_post(want=20, filter_is_liked=False)
         to_read_list = random.choices(unliked_list, k=want_like_num)
     except Exception as e:
